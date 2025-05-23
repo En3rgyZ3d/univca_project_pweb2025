@@ -22,7 +22,43 @@ def init_database() -> None:
         f = Faker("it_IT")
         with Session(engine) as session:
             # TODO: (optional) initialize the database with fake data
-            ...
+
+
+            # Fake User Data init
+
+            fake_user_list = [] # We'll use this to create fake (but valid) registration data
+            for i in range(10):
+                user = User(
+                    username=f.user_name(),
+                    email=f.email(),
+                    name=f.name()
+                )
+                fake_user_list.append(user.username) # Adding the username to the list
+                session.add(user)
+            session.commit()
+
+            # Fake Event Data init
+
+            for i in range(10):
+                event = Event(
+                    title= f.sentence(nb_words=5),
+                    description= f.sentence(nb_words=20),
+                    location= f.address(),
+                    date=f.date_time()
+                )
+                session.add(event)
+            session.commit()
+
+            # Fake Registration Data init
+
+            for i in range(10):
+                event_registration = Registration(
+                    username=fake_user_list[f.pyint(0,9)], # Random user in the list
+                    event_id = f.pyint(0,9) # Random event between the ones created
+                )
+                session.add(event_registration)
+            session.commit()
+
 
 
 def get_session():
