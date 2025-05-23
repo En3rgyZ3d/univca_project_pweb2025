@@ -24,7 +24,7 @@ def init_database() -> None:
             # TODO: (optional) initialize the database with fake data
 
 
-            # Fake User Data init
+            # -- Fake User Data init
 
             fake_user_list = [] # We'll use this to create fake (but valid) registration data
             for i in range(10):
@@ -37,7 +37,7 @@ def init_database() -> None:
                 session.add(user)
             session.commit()
 
-            # Fake Event Data init
+            # -- Fake Event Data init
 
             for i in range(10):
                 event = Event(
@@ -49,12 +49,24 @@ def init_database() -> None:
                 session.add(event)
             session.commit()
 
-            # Fake Registration Data init
+            # -- Fake Registration Data init
+
+            numbers_generated = [] # Empty list to check if a given combination already exists
+            # Since the combination of username and event_id in Registration is primary key of the registration table,
+            # the registrations must be unique; so, we need to check if a given combination already appeared
+            # while initialising the database.
 
             for i in range(10):
+                # If the combination already exists, then a new combination is generated
+                random_numbers = (f.pyint(0, 9), f.pyint(0, 9))
+                while random_numbers in numbers_generated:
+                    random_numbers = (f.pyint(0, 9), f.pyint(0, 9))
+
+                numbers_generated.append(random_numbers) # Once the combination is created, we add it to the list
+
                 event_registration = Registration(
-                    username=fake_user_list[f.pyint(0,9)], # Random user in the list
-                    event_id = f.pyint(0,9) # Random event between the ones created
+                    username=fake_user_list[random_numbers[0]], # Random user in the list
+                    event_id = random_numbers[1] # Random event between the ones created
                 )
                 session.add(event_registration)
             session.commit()
