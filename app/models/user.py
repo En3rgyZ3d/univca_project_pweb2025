@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel, Field
 
-
 class UserBase(SQLModel): # Common attributes
     name: str
     email: str
