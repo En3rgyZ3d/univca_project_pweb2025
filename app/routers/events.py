@@ -1,10 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path, HTTPException
+from sqlalchemy.orm import session
+
 from sqlmodel import select,delete
+from typing import Annotated
+
 
 from app.data.db import SessionDep
 from app.models.event import EventPublic, Event, EventCreate
 
 router = APIRouter(prefix="/events", tags=["events"])
+
 
 @router.get("/")
 def get_events(
@@ -13,6 +18,7 @@ def get_events(
     """Returns the events list."""
     events = session.exec(select(Event)).all() # Queries all the events in the Event table
     return events
+
 
 @router.post("/")
 def post_event(
@@ -38,4 +44,17 @@ def delete_events(
     # deletes all rows in the "event" table.
     session.commit()
     return "Events successfully deleted."
+
+
+@router.get("/{id}")
+def get_event_by_id(
+        id: Annotated[int, Path(description="ID of the event to search")],
+        session: SessionDep
+) -> EventPublic:
+    """Returns the event by id."""
+    event = session.get(Event, id) # Event is the table, id is the PK.
+    if event: # If the event is found, we return it; otherwise we return error code 404.
+        return event
+    else:
+        raise HTTPException(status_code=404, detail="Event not found")
 
