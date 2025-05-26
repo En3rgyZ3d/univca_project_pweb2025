@@ -21,7 +21,11 @@ def get_all_registrations(session: SessionDep) -> list[Registration]:
 
 
 @router.get("/{username}")
-def get_user_registrations(session: SessionDep, username: Annotated[str, Path(description="The Username of the User to check")]) -> list[EventPublic]:
+def get_user_registrations(
+    username: Annotated[str,
+    Path(description="The Username of the User to check")],
+    session: SessionDep
+) -> list[EventPublic]:
     """Returns all registrations of a given user"""
     statement = select(Event).join(Registration).where(Registration.username == username)
     registrations = session.exec(statement).all()
@@ -29,7 +33,11 @@ def get_user_registrations(session: SessionDep, username: Annotated[str, Path(de
 
 
 @router.delete("/{username}/{event_id}")
-def delete_registration(session: SessionDep, username: Annotated[str, Path(description="The Username of the User to check")], event_id: Annotated[int, Path(description="The ID of the Event to check")]) -> str:
+def delete_registration(
+    username: Annotated[str, Path(description="The Username of the User to check")],
+    event_id: Annotated[int, Path(description="The ID of the Event to check")],
+    session: SessionDep
+) -> str:
     """Deletes a registration"""
     statement = delete(Registration).where(Registration.username == username, Registration.event_id == event_id)
     session.exec(statement)
