@@ -58,3 +58,27 @@ def get_event_by_id(
     else:
         raise HTTPException(status_code=404, detail="Event not found")
 
+
+@router.put("/{id}")
+def update_event(
+        id: Annotated[int, Path(description="ID of the event to update")],
+        new_event: EventCreate,
+        session: SessionDep
+):
+    """Updates the event of the corresponding id."""
+    event_to_update = session.get(Event, id) # Queries for the corresponding event
+    if event_to_update: # If it's found, then the event is updated with the new_event info and then added to db
+        event_to_update.title = new_event.title
+        event_to_update.description = new_event.description
+        event_to_update.date = new_event.date
+        event_to_update.location = new_event.location
+
+        # Note: the use of model_validate is not necessary, since we are adding a valid "Event" instance to the DB
+        # (it already has an ID).
+
+        session.add(event_to_update) # Adds the updated event to the db (with the corresponding ID)
+        session.commit() # Confirms the changes
+        return "Event successfully updated."
+
+    else: # Else, a 404 is returned.
+        raise HTTPException(status_code=404, detail="Event not found")
