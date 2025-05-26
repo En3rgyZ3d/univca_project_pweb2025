@@ -3,9 +3,10 @@ from fastapi import APIRouter, Path, HTTPException
 from sqlmodel import select,delete
 from typing import Annotated
 
-
 from app.data.db import SessionDep
 from app.models.event import EventPublic, Event, EventCreate
+from app.models.registration import Registration
+from app.models.user import UserPublic, User
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -33,6 +34,50 @@ def post_event(
     return "Event successfully created."
 
 
+@router.post("/{id}/register")
+def register_user_to_event(
+        user_to_register: UserPublic,
+        id: Annotated[int, Path(description="ID of the event to register")],
+        session: SessionDep
+):
+    """Registers a user to the event with the specified ID."""
+
+    # First, we check if the parameters (user_to_register, event_to_register_id) are valid
+    user = session.get(User, user_to_register.username)
+    if not user:
+        # If the user doesn't exist, we report an error.
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    # We need to check if the data matches to the corresponding user.
+    if (user_to_register.name != user.name) or (user_to_register.email != user.email):
+        raise HTTPException(
+            status_code=409,
+            detail="Provided user information does not match the registered user data."
+        )
+
+    # Now we can check if the event is valid.
+    event = session.get(Event, id)
+    if not event:
+        # If the event doesn't exist, we report an error.
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    #Then, we check if the registration already exists
+    registration = session.get(Registration, (user_to_register.username, id))
+    if registration:
+        # If the registration already exists, we report an error.
+        raise HTTPException(status_code=403, detail="This user is already registered for the event.")
+
+    # Now we can add the registration
+
+    new_registration = Registration(username=user_to_register.username, event_id=id)
+    session.add(new_registration)
+    session.commit()
+    return "User successfully registered for this event."
+
+
+
+
+
 @router.delete("/")
 def delete_events(
         session: SessionDep
@@ -43,8 +88,6 @@ def delete_events(
     # deletes all rows in the "event" table.
     session.commit()
     return "Events successfully deleted."
-
-
 @router.get("/{id}")
 def get_event_by_id(
         id: Annotated[int, Path(description="ID of the event to search")],
