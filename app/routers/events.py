@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Path, HTTPException
-from sqlalchemy.orm import session
 
 from sqlmodel import select,delete
 from typing import Annotated
