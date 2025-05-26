@@ -3,9 +3,7 @@ from sqlmodel import select,delete
 from typing import Annotated
 from app.data.db import SessionDep
 from app.models.user import UserPublic, User, UserCreate
-from app.models.registration import Registration
-from app.models.user import UserPublic, User
-from datetime import datetime
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
