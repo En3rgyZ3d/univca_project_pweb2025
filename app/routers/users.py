@@ -4,7 +4,6 @@ from typing import Annotated
 from app.data.db import SessionDep
 from app.models.user import UserPublic, User, UserCreate
 
-
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/")
