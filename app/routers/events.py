@@ -65,7 +65,7 @@ def update_event(
         new_event: EventCreate,
         session: SessionDep
 ):
-    """Updates the event of the corresponding id."""
+    """Updates the event with the specified ID."""
     event_to_update = session.get(Event, id) # Queries for the corresponding event
     if event_to_update: # If it's found, then the event is updated with the new_event info and then added to db
         event_to_update.title = new_event.title
@@ -82,3 +82,20 @@ def update_event(
 
     else: # Else, a 404 is returned.
         raise HTTPException(status_code=404, detail="Event not found")
+
+
+@router.delete("/{id}")
+def delete_event(
+        id: Annotated[int, Path(description="ID of the event to delete")],
+        session: SessionDep
+):
+    """Deletes the event with the specified ID."""
+    event_to_delete = session.get(Event, id)
+    if event_to_delete: # If an event is found, then we delete it
+        session.delete(event_to_delete)
+        session.commit()
+        return "Event successfully deleted."
+    else: # Else return a 404.
+        raise HTTPException(status_code=404, detail="Event not found")
+
+
