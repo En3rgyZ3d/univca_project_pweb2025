@@ -87,7 +87,15 @@ def delete_events(
     # Since we don't have a "WHERE" condition in the statement, the database
     # deletes all rows in the "event" table.
     session.commit()
+
+    # Since we deleted all the events,
+    # We need to cancel all the registrations too.
+
+    session.exec(delete(Registration))
+    session.commit()
     return "Events successfully deleted."
+
+
 @router.get("/{id}")
 def get_event_by_id(
         id: Annotated[int, Path(description="ID of the event to search")],
@@ -108,6 +116,12 @@ def update_event(
         session: SessionDep
 ):
     """Updates the event with the specified ID."""
+    # -- Notes:
+    # In this function, we chose to keep the registrations even
+    # after the event is updated (instead of canceling them),
+    # leaving the web app with the opportunity to add a new feature
+    # to send an e-mail to users, notifying them about the update.
+
     event_to_update = session.get(Event, id) # Queries for the corresponding event
     if event_to_update: # If it's found, then the event is updated with the new_event info and then added to db
         event_to_update.title = new_event.title
@@ -136,8 +150,15 @@ def delete_event(
     if event_to_delete: # If an event is found, then we delete it
         session.delete(event_to_delete)
         session.commit()
+
+        # Now, we need to cancel every registration for the given event.
+        statement = delete(Registration).where(Registration.event_id == id) # NOQA
+        # With NOQA, we are disabling warnings that are known bugs in type checks with SQLAlchemy (safe to ignore)
+        session.exec(statement)
+        session.commit()
+
+
         return "Event successfully deleted."
     else: # Else return a 404.
         raise HTTPException(status_code=404, detail="Event not found")
-
 
