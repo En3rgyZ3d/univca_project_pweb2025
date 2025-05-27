@@ -30,14 +30,21 @@ def delete_registration(
     """Deletes a registration"""
     user_registered = session.get(User, username)
     event_to_cancel = session.get(Event, event_id)
-    if user_registered and event_to_cancel:
-        statement = delete(Registration).where((Registration.username == username), (Registration.event_id == event_id)) # NOQA
-        #No Quality Assurance tag that disables warnings in the line, because of a bug in type checks in SQLAlchemy
-        session.exec(statement)
-        session.commit()
 
-        return "Registration deleted successfully!"
+    if not user_registered:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not event_to_cancel:
+        raise HTTPException(status_code=404, detail="Event not found")
 
-    else:
+    registration_to_cancel = session.get(Registration, (username, event_id))
+
+    if not registration_to_cancel:
         raise HTTPException(status_code=404, detail="Registration not found")
+
+    statement = delete(Registration).where((Registration.username == username), (Registration.event_id == event_id))  # NOQA
+    # No Quality Assurance tag that disables warnings in the line, because of a bug in type checks in SQLAlchemy
+    session.exec(statement)
+    session.commit()
+
+    return "Registration deleted successfully"
 
