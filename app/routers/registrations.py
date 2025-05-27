@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Path, HTTPException
 from sqlalchemy.orm import session
 
-from sqlmodel import select,delete
+from sqlmodel import select, delete
 from typing import Annotated
 
 from app.data.db import SessionDep
@@ -15,33 +15,29 @@ router= APIRouter(prefix="/registrations")
 @router.get("/")
 def get_all_registrations(session: SessionDep) -> list[Registration]:
     """Returns all registrations"""
-    statement = select(Registration)
-    registrations = session.exec(statement).all()
+    registrations = session.exec(select(Registration)).all()
     return registrations
 
 
-@router.get("/{username}")
-def get_user_registrations(
-    username: Annotated[str,
-    Path(description="The Username of the User to check")],
-    session: SessionDep
-) -> list[EventPublic]:
-    """Returns all registrations of a given user"""
-    statement = select(Event).join(Registration).where(Registration.username == username)
-    registrations = session.exec(statement).all()
-    return registrations
 
 
-@router.delete("/{username}/{event_id}")
+@router.delete("/")
 def delete_registration(
-    username: Annotated[str, Path(description="The Username of the User to check")],
-    event_id: Annotated[int, Path(description="The ID of the Event to check")],
-    session: SessionDep
+        username: Annotated[str, Query(description="The Username of the User to check")],
+        event_id: Annotated[int, Query(description="The ID of the Event to check")],
+        session: SessionDep
 ) -> str:
     """Deletes a registration"""
-    statement = delete(Registration).where(Registration.username == username, Registration.event_id == event_id)
-    session.exec(statement)
-    session.commit()
-    return ("Registration deleted successfully!")
+    user_registered = session.get(User, username)
+    event_to_cancel = session.get(Event, event_id)
+    if user_registered and event_to_cancel:
+        statement = delete(Registration).where((Registration.username == username), (Registration.event_id == event_id)) # NOQA
+        #No Quality Assurance tag that disables warnings in the line, because of a bug in type checks in SQLAlchemy
+        session.exec(statement)
+        session.commit()
 
+        return "Registration deleted successfully!"
+
+    else:
+        raise HTTPException(status_code=404, detail="Registration not found")
 
