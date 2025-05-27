@@ -14,7 +14,8 @@ router= APIRouter(prefix="/registrations")
 
 @router.get("/")
 def get_all_registrations(session: SessionDep) -> list[Registration]:
-    """Returns all registrations"""
+    """Returns all registrations."""
+    # Does a query to get all the registrations
     registrations = session.exec(select(Registration)).all()
     return registrations
 
@@ -27,15 +28,17 @@ def delete_registration(
         event_id: Annotated[int, Query(description="The ID of the Event to check")],
         session: SessionDep
 ) -> str:
-    """Deletes a registration"""
+    """Deletes a registration."""
     user_registered = session.get(User, username)
     event_to_cancel = session.get(Event, event_id)
 
+    # check if the user and event exist if not raise an exception
     if not user_registered:
         raise HTTPException(status_code=404, detail="User not found")
     if not event_to_cancel:
         raise HTTPException(status_code=404, detail="Event not found")
 
+    # check if the registration exists if not raise an exception
     registration_to_cancel = session.get(Registration, (username, event_id))
 
     if not registration_to_cancel:
