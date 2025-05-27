@@ -36,7 +36,7 @@ app.mount(
     name="static"
 )
 app.include_router(frontend.router)
-app.include_router(registrations.router, tags=["registrations"]) # the tag has to be moved into routers\registrations
+app.include_router(registrations.router)
 app.include_router(events.router)
 
 
