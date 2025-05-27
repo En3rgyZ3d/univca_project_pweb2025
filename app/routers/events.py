@@ -51,7 +51,7 @@ def register_user_to_event(
     # We need to check if the data matches to the corresponding user.
     if (user_to_register.name != user.name) or (user_to_register.email != user.email):
         raise HTTPException(
-            status_code=409,
+            status_code=409, # 409 Conflict
             detail="Provided user information does not match the registered user data."
         )
 
@@ -65,7 +65,7 @@ def register_user_to_event(
     registration = session.get(Registration, (user_to_register.username, id))
     if registration:
         # If the registration already exists, we report an error.
-        raise HTTPException(status_code=403, detail="This user is already registered for the event.")
+        raise HTTPException(status_code=403, detail="This user is already registered for the event.") # 403 Forbidden
 
     # Now we can add the registration
 
