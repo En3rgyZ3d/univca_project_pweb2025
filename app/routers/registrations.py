@@ -9,7 +9,7 @@ from app.models.registration import Registration
 from app.models.event import Event, EventPublic
 from app.models.user import User, UserPublic
 
-router= APIRouter(prefix="/registrations". tags=["/registrations"])
+router= APIRouter(prefix="/registrations", tags=["/registrations"])
 
 
 @router.get("/")
