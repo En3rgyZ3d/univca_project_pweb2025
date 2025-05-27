@@ -31,7 +31,7 @@ def post_event(
     # creates an instance of Event, which can be added to the database.
 
     session.commit()
-    return "Event successfully created."
+    return "Event successfully created"
 
 
 @router.post("/{id}/register")
@@ -46,7 +46,7 @@ def register_user_to_event(
     user = session.get(User, user_to_register.username)
     if not user:
         # If the user doesn't exist, we report an error.
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise HTTPException(status_code=404, detail="User not found")
 
     # We need to check if the data matches to the corresponding user.
     if (user_to_register.name != user.name) or (user_to_register.email != user.email):
@@ -59,7 +59,7 @@ def register_user_to_event(
     event = session.get(Event, id)
     if not event:
         # If the event doesn't exist, we report an error.
-        raise HTTPException(status_code=404, detail="Event not found.")
+        raise HTTPException(status_code=404, detail="Event not found")
 
     #Then, we check if the registration already exists
     registration = session.get(Registration, (user_to_register.username, id))
@@ -93,7 +93,11 @@ def delete_events(
 
     session.exec(delete(Registration))
     session.commit()
-    return "Events successfully deleted."
+    # We chose to cancel and confirm the table even if it's empty, in order to avoid
+    # a misunderstanding by the user that might think that an error prevented them
+    # to cancel the events.
+
+    return "Events successfully deleted"
 
 
 @router.get("/{id}")
@@ -134,7 +138,7 @@ def update_event(
 
         session.add(event_to_update) # Adds the updated event to the db (with the corresponding ID)
         session.commit() # Confirms the changes
-        return "Event successfully updated."
+        return "Event successfully updated"
 
     else: # Else, a 404 is returned.
         raise HTTPException(status_code=404, detail="Event not found")
@@ -146,6 +150,11 @@ def delete_event(
         session: SessionDep
 ):
     """Deletes the event with the specified ID."""
+    # Here, we chose to check if an event with the specified ID exists, since when we delete
+    # the whole table, we usually do not need to know the previous state of the table (we need
+    # to erase it); on the other hand, we would like to know if we are deleting an event that
+    # existed previously or not, thus requiring a check.
+
     event_to_delete = session.get(Event, id)
     if event_to_delete: # If an event is found, then we delete it
         session.delete(event_to_delete)
@@ -158,7 +167,7 @@ def delete_event(
         session.commit()
 
 
-        return "Event successfully deleted."
+        return "Event successfully deleted"
     else: # Else return a 404.
         raise HTTPException(status_code=404, detail="Event not found")
 
