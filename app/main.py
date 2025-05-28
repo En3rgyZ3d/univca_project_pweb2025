@@ -14,7 +14,7 @@ if Path(__file__).parent == Path(os.getcwd()):
 
 from fastapi import FastAPI
 
-from app.routers import frontend, events, registrations
+from app.routers import frontend, events, registrations, users
 
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
@@ -28,7 +28,6 @@ async def lifespan(app: FastAPI):
     yield
     # on close
 
-
 app = FastAPI(lifespan=lifespan)
 app.mount(
     "/static",
@@ -36,8 +35,10 @@ app.mount(
     name="static"
 )
 app.include_router(frontend.router)
+
 app.include_router(registrations.router)
 app.include_router(events.router)
+app.include_router(users.router)
 
 
 if __name__ == "__main__":

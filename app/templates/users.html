@@ -4,7 +4,14 @@
 
 {% block content %}
 <div class="container">
+
   <h1 class="mb-4">Manage Users</h1>
+
+  <div id="search-box" class="search-box">
+    <label for="search"></label>
+    <input type="search" id="search" class="search" placeholder="Search...">
+    <button type="button" class="button" id="search-btn"><i class="fa fa-search" aria-hidden="true"></i></button>
+  </div>
 
   <!-- Users List -->
   <div id="users-list" class="mb-4">
@@ -70,6 +77,45 @@
     } catch (error) {
       console.error('Error fetching users:', error);
       document.getElementById('users-list').innerHTML = '<p>Error loading users.</p>';
+    }
+  }
+
+  // Search functionality
+  document.getElementById('search-btn').addEventListener('click', handleSearch);
+  document.getElementById('search').addEventListener('input', function () {
+    if (this.value.trim() === '') {
+      fetchUsers(); // Reset list if input is cleared
+    }
+  });
+
+  document.getElementById('search').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  });
+
+  async function handleSearch() {
+    const searchValue = document.getElementById('search').value.trim();
+    if (!searchValue) {
+      fetchUsers(); // if empty, show all
+      return;
+    }
+
+    try {
+      const response = await fetch(`/users/${encodeURIComponent(searchValue)}`);
+      const usersList = document.getElementById('users-list');
+
+      if (response.ok) {
+        const user = await response.json();
+        renderUsers([user]); // Pass as array to reuse same render function
+      }
+      else {
+        usersList.innerHTML = `<p>User "${searchValue}" not found.</p>`;
+      }
+    }
+    catch (error) {
+      console.error('Error searching user:', error);
+      document.getElementById('users-list').innerHTML = '<p>Error loading user.</p>';
     }
   }
 
