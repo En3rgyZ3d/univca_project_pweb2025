@@ -77,7 +77,7 @@ def register_user_to_event(
     registration = session.get(Registration, (user_to_register.username, id))
     if registration:
         # If the registration already exists, we report an error.
-        raise HTTPException(status_code=403, detail="This user is already registered for the event.") # 403 Forbidden
+        raise HTTPException(status_code=409, detail="This user is already registered for the event.") # 409 Conflict
 
     # Now we can add the registration
 
