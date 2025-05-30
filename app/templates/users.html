@@ -7,6 +7,7 @@
 
   <h1 class="mb-4">Manage Users</h1>
 
+  <!-- Search for a specific user by username.-->
   <div id="search-box" class="search-box">
     <label for="search"></label>
     <input type="search" id="search" class="search" placeholder="Search...">
@@ -70,11 +71,13 @@
       if (response.ok) {
         const users = await response.json();
         renderUsers(users);
-      } else {
+      }
+      else {
         console.error('Error fetching users:', response.statusText);
         document.getElementById('users-list').innerHTML = '<p>Error loading users.</p>';
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error fetching users:', error);
       document.getElementById('users-list').innerHTML = '<p>Error loading users.</p>';
     }
@@ -88,12 +91,14 @@
     }
   });
 
+  // Listen for the 'Enter' key press in the search input field
   document.getElementById('search').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       handleSearch();
     }
   });
 
+  //Function to handle user search by username
   async function handleSearch() {
     const searchValue = document.getElementById('search').value.trim();
     if (!searchValue) {
@@ -102,14 +107,17 @@
     }
 
     try {
+      // Send a GET request to fetch the user by username
       const response = await fetch(`/users/${encodeURIComponent(searchValue)}`);
       const usersList = document.getElementById('users-list');
 
       if (response.ok) {
+        // If the response is OK, parse the user data and render it
         const user = await response.json();
         renderUsers([user]); // Pass as array to reuse same render function
       }
       else {
+        // If the user is not found, show a message
         usersList.innerHTML = `<p>User "${searchValue}" not found.</p>`;
       }
     }
