@@ -7,7 +7,7 @@
 
   <h1 class="mb-4">Manage Users</h1>
 
-  <!-- Search for a specific user by username.-->
+  <!-- #users_api: Search for a specific user by username.-->
   <div id="search-box" class="search-box">
     <label for="search"></label>
     <input type="search" id="search" class="search" placeholder="Search...">
@@ -83,6 +83,7 @@
     }
   }
 
+  /* ------- Feature (start): users API ------- */
   // Search functionality
   document.getElementById('search-btn').addEventListener('click', handleSearch);
   document.getElementById('search').addEventListener('input', function () {
@@ -126,6 +127,7 @@
       document.getElementById('users-list').innerHTML = '<p>Error loading user.</p>';
     }
   }
+  /* ------------- */
 
   // Dynamically render each user as a card
   function renderUsers(users) {

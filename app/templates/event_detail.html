@@ -19,6 +19,7 @@
     </div>
   </section>
 
+  <!-- #users_api: Displays a popup window to show user details with a close button -->
   <div id="popup" class="popup">
     <span class="close-button" onclick="closePopup()">×</span>
     <div id="popupContent"></div>
@@ -164,6 +165,7 @@
       deleteButton.textContent = 'Delete';
       deleteButton.className = 'btn btn-danger btn-sm';
 
+      /* ------- Feature (start): users API ------- */
       // Create the details button
       const detailsButton = document.createElement('button');
       detailsButton.textContent = 'Details';
@@ -222,6 +224,8 @@
         }
       });
 
+      /* ------------- */
+
 
       deleteButton.addEventListener('click', () => {
         const url = `/registrations?username=${encodeURIComponent(reg.username)}&event_id=${encodeURIComponent(reg.event_id)}`;
@@ -248,7 +252,7 @@
 
       // Append the username and button to the list item
       listItem.appendChild(userText);
-      listItem.appendChild(buttonContainer);
+      listItem.appendChild(buttonContainer); // #users_api: wrapped both buttons for alignment
       list.appendChild(listItem);
     });
 
