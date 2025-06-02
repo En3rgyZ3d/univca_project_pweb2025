@@ -20,10 +20,27 @@ def get_users(session: SessionDep) -> list[UserPublic]:
 
 
 @router.post("/")
-def create_user(session: SessionDep, user: UserCreate):
+def create_user(session: SessionDep, new_user: UserCreate):
     """Creates a new user"""
-    session.add(User.model_validate(user))
-    session.commit()
+
+    # Before adding a user, we check if an email is already registered
+    statement = select(User).where(User.email == new_user.email)
+
+    duplicate = session.exec(statement).first()
+    # .first() returns the first value of the query or None if no match is found
+
+    if duplicate:
+        raise HTTPException(status_code=409, detail="Email already registered") # 409 Conflict
+
+    # Now we check if the username is already taken
+    existing_user = session.get(User, new_user.username)
+
+    if existing_user:
+        raise HTTPException(status_code=409, detail="Username is already taken") # 409 Conflict
+    else:
+        session.add(User.model_validate(new_user))
+        session.commit()
+
     return "User successfully created"
 
 
@@ -61,9 +78,17 @@ def delete_a_user(
 ):
     """Deletes a user from the list."""
 
-    user_to_delete = session.get(User, username)
-    session.delete(user_to_delete)
-    session.commit()
+    # We check if the user exists
+    existing_user = session.get(User, username)
+
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    else:
+        user_to_delete = session.get(User, username)
+        session.delete(user_to_delete)
+        session.commit()
+
+
 
     statement = delete(Registration).where(Registration.username == username)  # NOQA
     # With NOQA, we are disabling warnings that are known bugs in type checks with SQLAlchemy (safe to ignore)
