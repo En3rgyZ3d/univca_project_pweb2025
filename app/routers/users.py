@@ -1,11 +1,16 @@
-from fastapi import APIRouter, Path, HTTPException, status
+from fastapi import APIRouter, Path, HTTPException
+
 from sqlmodel import select,delete
 from typing import Annotated
+
 from app.data.db import SessionDep
 from app.models.user import UserPublic, User, UserCreate
 from app.models.registration import Registration
 
+
 router = APIRouter(prefix="/users", tags=["users"])
+
+
 
 @router.get("/")
 def get_users(session: SessionDep) -> list[UserPublic]:
@@ -13,12 +18,14 @@ def get_users(session: SessionDep) -> list[UserPublic]:
     users = session.exec(select(User)).all() # Queries all the users in the users table
     return users
 
+
 @router.post("/")
 def create_user(session: SessionDep, user: UserCreate):
     """Creates a new user"""
     session.add(User.model_validate(user))
     session.commit()
-    return "User successfully created."
+    return "User successfully created"
+
 
 @router.delete("/")
 def delete_users(session: SessionDep):
@@ -26,14 +33,20 @@ def delete_users(session: SessionDep):
     session.exec(delete(User))
     session.commit()
 
-    """Deletes all registrations from the list."""
+    # Deletes all registrations from the list (same reason as in events endpoint).
     session.exec(delete(Registration))
     session.commit()
-    return "Users successfully deleted."
+
+    # We don't check if users table is empty (same reason as in events endpoint).
+    return "Users successfully deleted"
+
 
 @router.get("/{username}", response_model=UserPublic)
-def get_user_by_username(username: Annotated[str, Path(description="Username of the user to search")], session: SessionDep):
-    # Retrieve a user by username from the database.
+def get_user_by_username(
+        username: Annotated[str, Path(description="Username of the user to search")],
+        session: SessionDep
+):
+    """Retrieves a user by username from the database."""
     user = session.get(User, username) # User is the table, username is the PK.
     if user: # If the user is found, we return it; otherwise we return error code 404.
         return user
@@ -42,8 +55,11 @@ def get_user_by_username(username: Annotated[str, Path(description="Username of 
 
 
 @router.delete("/{username}")
-def delete_a_user(username: Annotated[str, Path(description="Username of the user to delete")], session: SessionDep):
-    """Delete a user from the list."""
+def delete_a_user(
+        username: Annotated[str, Path(description="Username of the user to delete")],
+        session: SessionDep
+):
+    """Deletes a user from the list."""
 
     user_to_delete = session.get(User, username)
     session.delete(user_to_delete)
@@ -55,14 +71,4 @@ def delete_a_user(username: Annotated[str, Path(description="Username of the use
     session.commit()
 
     return "User successfully deleted."
-
-
-
-
-
-
-
-
-
-
 
