@@ -22,11 +22,23 @@ def get_events(
 
 @router.post("/")
 def post_event(
-        event: EventCreate,
+        new_event: EventCreate,
         session: SessionDep
 ):
     """Adds a new event to the list."""
-    session.add(Event.model_validate(event))
+    # Before adding an event, we check if a duplicate exists
+    statement = select(Event).where(Event.title == new_event.title,
+                                    Event.description == new_event.description,
+                                    Event.location == new_event.location,
+                                    Event.date == new_event.date)
+
+    duplicate = session.exec(statement).first()
+    # .first() returns the first value of the query or None if no match is found
+    
+    if duplicate:
+        raise HTTPException(status_code=409, detail = "The event already exists.") # 409 Conflict
+
+    session.add(Event.model_validate(new_event))
     # model_validate takes the data from the EventCreate instance and
     # creates an instance of Event, which can be added to the database.
 
@@ -65,7 +77,7 @@ def register_user_to_event(
     registration = session.get(Registration, (user_to_register.username, id))
     if registration:
         # If the registration already exists, we report an error.
-        raise HTTPException(status_code=403, detail="This user is already registered for the event.") # 403 Forbidden
+        raise HTTPException(status_code=409, detail="This user is already registered for the event.") # 409 Conflict
 
     # Now we can add the registration
 
