@@ -8,7 +8,9 @@ from app.models.event import EventPublic, Event, EventCreate
 from app.models.registration import Registration
 from app.models.user import UserPublic, User
 
+
 router = APIRouter(prefix="/events", tags=["events"])
+
 
 
 @router.get("/")
@@ -36,7 +38,10 @@ def post_event(
     # .first() returns the first value of the query or None if no match is found
     
     if duplicate:
-        raise HTTPException(status_code=409, detail = "The event already exists.") # 409 Conflict
+        raise HTTPException(
+            status_code=409,
+            detail = "The event already exists."
+        ) # 409 Conflict
 
     session.add(Event.model_validate(new_event))
     # model_validate takes the data from the EventCreate instance and
@@ -77,7 +82,10 @@ def register_user_to_event(
     registration = session.get(Registration, (user_to_register.username, id))
     if registration:
         # If the registration already exists, we report an error.
-        raise HTTPException(status_code=409, detail="This user is already registered for the event.") # 409 Conflict
+        raise HTTPException(
+            status_code=409,
+            detail="This user is already registered for the event."
+        ) # 409 Conflict
 
     # Now we can add the registration
 
@@ -85,9 +93,6 @@ def register_user_to_event(
     session.add(new_registration)
     session.commit()
     return "User successfully registered for this event."
-
-
-
 
 
 @router.delete("/")
@@ -177,8 +182,6 @@ def delete_event(
         # With NOQA, we are disabling warnings that are known bugs in type checks with SQLAlchemy (safe to ignore)
         session.exec(statement)
         session.commit()
-
-
         return "Event successfully deleted"
     else: # Else return a 404.
         raise HTTPException(status_code=404, detail="Event not found")

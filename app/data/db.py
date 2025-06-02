@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 import os
 from faker import Faker
+
 from app.config import config
-# TODO: remember to import all the DB models here
-from app.models.registration import Registration  # NOQA
+from app.models.registration import Registration
 from app.models.user import User
 from app.models.event import Event
 
@@ -21,8 +21,6 @@ def init_database() -> None:
     if not ds_exists:
         f = Faker("it_IT")
         with Session(engine) as session:
-            # TODO: (optional) initialize the database with fake data
-
 
             # -- Fake User Data init
 
@@ -35,7 +33,7 @@ def init_database() -> None:
                 )
                 fake_user_list.append(user.username) # Adding the username to the list
                 session.add(user)
-            session.commit()
+            session.commit() # Commits the changes to the db
 
             # -- Fake Event Data init
 
