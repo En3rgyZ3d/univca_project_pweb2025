@@ -25,25 +25,80 @@ def init_database() -> None:
             # -- Fake User Data init
 
             fake_user_list = [] # We'll use this to create fake (but valid) registration data
+
+            # We need the username (and the email, since it would be secondary key) to be unique,
+            # so we track the ones that already come out; if we get a duplicate, we generate
+            # a new value.
+
+            fake_usernames = []
+            fake_emails = []
+
             for i in range(10):
+                generated_username = f.user_name()
+                while generated_username in fake_usernames:
+                    generated_username = f.user_name()
+
+                generated_email = f.email()
+                while generated_email in fake_emails:
+                    generated_email = f.email()
+
                 user = User(
-                    username=f.user_name(),
-                    email=f.email(),
+                    username=generated_username,
+                    email=generated_email,
                     name=f.name()
                 )
                 fake_user_list.append(user.username) # Adding the username to the list
+                fake_usernames.append(generated_username)
+                fake_emails.append(generated_email)
                 session.add(user)
+
             session.commit() # Commits the changes to the db
 
             # -- Fake Event Data init
 
+
+            # We check that no duplicate event is created (even though not required by the db structure)
+
+            fake_titles = []
+            fake_descriptions = []
+            fake_locations = []
+            fake_dates = []
+
             for i in range(10):
+
+                generated_title = f.title(nb_words=5)
+                generated_description = f.description(nb_words=20)
+                generated_location = f.address()
+                generated_date = f.date_time()
+
+                # Checks if duplicates
+
+                while generated_title in fake_titles:
+                    generated_title = f.title(nb_words=5)
+
+                while generated_description in fake_descriptions:
+                    generated_description = f.description(nb_words=20)
+
+                while generated_location in fake_locations:
+                    generated_location = f.address()
+
+                while generated_date in fake_dates:
+                    generated_date = f.date_time()
+
+                # Appends to the list
+
+                fake_titles.append(generated_title)
+                fake_descriptions.append(generated_description)
+                fake_locations.append(generated_location)
+                fake_dates.append(generated_date)
+
                 event = Event(
-                    title= f.sentence(nb_words=5),
-                    description= f.sentence(nb_words=20),
-                    location= f.address(),
-                    date=f.date_time()
+                    title= generated_title,
+                    description= generated_description,
+                    location= generated_location,
+                    date=generated_date
                 )
+
                 session.add(event)
             session.commit()
 
