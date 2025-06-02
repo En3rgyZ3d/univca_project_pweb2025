@@ -19,6 +19,12 @@
     </div>
   </section>
 
+  <!-- #users_api: Displays a popup window to show user details with a close button -->
+  <div id="popup" class="popup">
+    <span class="close-button" onclick="closePopup()">×</span>
+    <div id="popupContent"></div>
+  </div>
+
   <!-- Update Event Form -->
   <h2 class="mt-5">Update Event</h2>
   <form id="update-event-form" class="mb-5">
@@ -102,7 +108,8 @@
         document.getElementById('event-description').value = event.description;
         document.getElementById('event-date').value = new Date(event.date).toISOString().slice(0, 16);
         document.getElementById('event-location').value = event.location;
-      } else {
+      }
+      else {
         document.getElementById('event-details').innerHTML = `<p>Error: Could not load event details.</p>`;
         console.error('Error fetching event details:', response.statusText);
       }
@@ -157,8 +164,68 @@
       const deleteButton = document.createElement('button');
       deleteButton.textContent = 'Delete';
       deleteButton.className = 'btn btn-danger btn-sm';
-      // Optional: add additional margin for spacing if needed
-      deleteButton.style.marginLeft = '10px';
+
+      /* ------- Feature (start): users API ------- */
+      // Create the details button
+      const detailsButton = document.createElement('button');
+      detailsButton.textContent = 'Details';
+      detailsButton.className = 'btn btn-sm btn-info';
+
+      // Create a container for the buttons
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.justifyContent = 'flex-end';
+      buttonContainer.style.gap = '5px';
+      buttonContainer.style.marginLeft = 'auto';
+
+      // Append buttons to the container
+      buttonContainer.appendChild(detailsButton);
+      buttonContainer.appendChild(deleteButton);
+
+      // Get the popup element by its ID
+      const popup = document.getElementById("popup");
+
+      // Function to open the popup by adding a CSS class
+      function openPopup() {
+        popup.classList.add("open-popup");
+      }
+
+      // Function to close the popup by removing the CSS class
+      function closePopup() {
+        popup.classList.remove("open-popup");
+      }
+      window.closePopup = closePopup;
+
+      // Add an event listener to the details button
+      detailsButton.addEventListener('click', async () => {
+        try {
+          // Send a GET request to fetch user data based on reg.username
+          const response = await fetch(`/users/${encodeURIComponent(reg.username)}`);
+          if (response.ok) {
+            const user = await response.json();
+
+            // Populate the popup content with user information
+            document.getElementById('popupContent').innerHTML = `
+              <h3>${user.username}</h3>
+              <p><strong>Nome:</strong> ${user.name}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+            `;
+
+            // Open the popup
+            openPopup();
+            }
+          else {
+            console.error("Errore nella risposta del server");
+          }
+        }
+        catch (error) {
+          // Log any error that occurred during the fetch request
+          console.error("Errore nella fetch:", error);
+        }
+      });
+
+      /* ------------- */
+
 
       deleteButton.addEventListener('click', () => {
         const url = `/registrations?username=${encodeURIComponent(reg.username)}&event_id=${encodeURIComponent(reg.event_id)}`;
@@ -185,7 +252,7 @@
 
       // Append the username and button to the list item
       listItem.appendChild(userText);
-      listItem.appendChild(deleteButton);
+      listItem.appendChild(buttonContainer); // #users_api: wrapped both buttons for alignment
       list.appendChild(listItem);
     });
 

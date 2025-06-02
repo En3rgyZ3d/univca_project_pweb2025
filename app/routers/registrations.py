@@ -19,9 +19,6 @@ def get_all_registrations(session: SessionDep) -> list[Registration]:
     registrations = session.exec(select(Registration)).all()
     return registrations
 
-
-
-
 @router.delete("/")
 def delete_registration(
         username: Annotated[str, Query(description="The Username of the User to check")],
