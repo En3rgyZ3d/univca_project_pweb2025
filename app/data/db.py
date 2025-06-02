@@ -66,18 +66,18 @@ def init_database() -> None:
 
             for i in range(10):
 
-                generated_title = f.title(nb_words=5)
-                generated_description = f.description(nb_words=20)
+                generated_title = f.sentence(nb_words=5)
+                generated_description = f.sentence(nb_words=20)
                 generated_location = f.address()
                 generated_date = f.date_time()
 
                 # Checks if duplicates
 
                 while generated_title in fake_titles:
-                    generated_title = f.title(nb_words=5)
+                    generated_title = f.sentence(nb_words=5)
 
                 while generated_description in fake_descriptions:
-                    generated_description = f.description(nb_words=20)
+                    generated_description = f.sentence(nb_words=20)
 
                 while generated_location in fake_locations:
                     generated_location = f.address()
