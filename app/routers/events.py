@@ -34,10 +34,10 @@ def post_event(
                                     Event.location == new_event.location,
                                     Event.date == new_event.date)
 
-    duplicate = session.exec(statement).first()
+    duplicated_event = session.exec(statement).first()
     # .first() returns the first value of the query or None if no match is found
     
-    if duplicate:
+    if duplicated_event:
         raise HTTPException(
             status_code=409,
             detail = "The event already exists."
@@ -60,21 +60,21 @@ def register_user_to_event(
     """Registers a user to the event with the specified ID."""
 
     # First, we check if the parameters (user_to_register, event_to_register_id) are valid
-    user = session.get(User, user_to_register.username)
-    if not user:
+    valid_user = session.get(User, user_to_register.username)
+    if not valid_user:
         # If the user doesn't exist, we report an error.
         raise HTTPException(status_code=404, detail="User not found")
 
     # We need to check if the data matches to the corresponding user.
-    if (user_to_register.name != user.name) or (user_to_register.email != user.email):
+    if (user_to_register.name != valid_user.name) or (user_to_register.email != valid_user.email):
         raise HTTPException(
             status_code=409, # 409 Conflict
             detail="Provided user information does not match the registered user data."
         )
 
     # Now we can check if the event is valid.
-    event = session.get(Event, id)
-    if not event:
+    valid_event = session.get(Event, id)
+    if not valid_event:
         # If the event doesn't exist, we report an error.
         raise HTTPException(status_code=404, detail="Event not found")
 
@@ -155,10 +155,10 @@ def update_event(
                                         Event.location == new_event.location,
                                         Event.date == new_event.date)
 
-        duplicate = session.exec(statement).first()
+        duplicated_event = session.exec(statement).first()
         # .first() returns the first value of the query or None if no match is found
 
-        if duplicate:
+        if duplicated_event:
             raise HTTPException(
                 status_code=409,
                 detail="This event already exists."
