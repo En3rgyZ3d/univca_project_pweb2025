@@ -113,15 +113,31 @@ function renderEvents(events) {
           const res = await fetch(`/events/${eventId}`, { method: 'DELETE' });
           if (res.ok) {
             // Optionally parse response data if needed: const data = await res.json();
-            modalBody.textContent = await res.text();
+            //modalBody.textContent = await res.text();
+
+            // #fix: bug caused by using res.text() on a JSON string
+            const message = await res.json();
+            modalBody.textContent = message;
+
             fetchEvents();  // Refresh the list after deletion
           } else {
-            modalBody.textContent = await res.text();
+            //modalBody.textContent = await res.text();
+
+            // #fix: bug caused by using res.text() on a JSON string
+            const errorData = await res.json(); // <--- qui!
+            modalBody.textContent = errorData.detail;
+
             console.error('Error deleting event');
           }
         } catch (error) {
           console.error('Error deleting event:', error);
-          modalBody.textContent = 'Error deleting event: ' + error.toString();
+          //modalBody.textContent = 'Error deleting event: ' + error.toString();
+
+          // #fix: bug caused by using res.text() on a JSON string
+          const errorData = await res.json(); // <--- qui!
+          modalBody.textContent = errorData.detail;
+
+          console.error('Error deleting event:', error);
         }
         // Create and show the Bootstrap modal
         const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
@@ -153,12 +169,21 @@ document.getElementById('add-event-form').addEventListener('submit', async funct
     });
     if (res.ok) {
       // Optionally parse response data if needed: const data = await res.json();
-      modalBody.textContent = await res.text();
+      //modalBody.textContent = await res.text();
+
+      // #fix: bug caused by using res.text() on a JSON string
+      const message = await res.json();
+      modalBody.textContent = message;
+
       // Clear the form and refresh events
       this.reset();
       fetchEvents();
     } else {
-      modalBody.textContent = await res.text();
+      //modalBody.textContent = await res.text();
+
+      // #fix: bug caused by using res.text() on a JSON string
+      const errorData = await res.json();
+      modalBody.textContent = errorData.detail;
     }
   } catch (error) {
     console.error('Error adding event:', error);
@@ -181,7 +206,11 @@ document.getElementById('delete-all').addEventListener('click', async function()
       const res = await fetch('/events', { method: 'DELETE' });
       if (res.ok) {
         // Optionally parse response data if needed: const data = await res.json();
-        modalBody.textContent = await res.text();
+        //modalBody.textContent = await res.text();
+
+        // #fix: bug caused by using res.text() on a JSON string
+        const message = await res.json();
+        modalBody.textContent = message;
         fetchEvents();
       } else {
         modalBody.textContent = await res.text();
