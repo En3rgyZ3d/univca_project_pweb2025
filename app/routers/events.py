@@ -145,6 +145,25 @@ def update_event(
 
     event_to_update = session.get(Event, id) # Queries for the corresponding event
     if event_to_update: # If it's found, then the event is updated with the new_event info and then added to db
+
+        # Note: this code is the same in post_event, but removing duplication involves
+        #       too much abstraction and risks of circular imports,
+        #       so it's better to leave it as it is.
+
+        statement = select(Event).where(Event.title == new_event.title,
+                                        Event.description == new_event.description,
+                                        Event.location == new_event.location,
+                                        Event.date == new_event.date)
+
+        duplicate = session.exec(statement).first()
+        # .first() returns the first value of the query or None if no match is found
+
+        if duplicate:
+            raise HTTPException(
+                status_code=409,
+                detail="This event already exists."
+            )  # 409 Conflict
+
         event_to_update.title = new_event.title
         event_to_update.description = new_event.description
         event_to_update.date = new_event.date
@@ -152,6 +171,10 @@ def update_event(
 
         # Note: the use of model_validate is not necessary, since we are adding a valid "Event" instance to the DB
         # (it already has an ID).
+
+
+
+
 
         session.add(event_to_update) # Adds the updated event to the db (with the corresponding ID)
         session.commit() # Confirms the changes
