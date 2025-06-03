@@ -28,14 +28,14 @@ def delete_registration(
         session: SessionDep
 ) -> str:
     """Deletes a registration."""
-    valid_user = session.get(User, username)
-    valid_event = session.get(Event, event_id)
+    user_registered  = session.get(User, username)
+    event_registered = session.get(Event, event_id)
 
     # Checks if the user and event exist; if not, raise an exception
 
-    if not valid_user:
+    if not user_registered :
         raise HTTPException(status_code=404, detail="User not found")
-    if not valid_event:
+    if not event_registered:
         raise HTTPException(status_code=404, detail="Event not found")
 
     # Checks if the registration exists; if not, raise an exception
