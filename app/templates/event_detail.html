@@ -242,7 +242,7 @@
           })
           .then(data => {
             modalBody.textContent = data;
-        })
+          })
           .catch(error => {
             console.error('Error while deleting registration:', error);
             modalBody.textContent = 'Error deleting registration: ' + error.toString();
