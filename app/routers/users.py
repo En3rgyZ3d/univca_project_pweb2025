@@ -26,16 +26,16 @@ def create_user(session: SessionDep, new_user: UserCreate):
     # Before adding a user, we check if an email is already registered
     statement = select(User).where(User.email == new_user.email)
 
-    duplicate = session.exec(statement).first()
+    duplicated_user_email = session.exec(statement).first()
     # .first() returns the first value of the query or None if no match is found
 
-    if duplicate:
+    if duplicated_user_email:
         raise HTTPException(status_code=409, detail="Email already registered") # 409 Conflict
 
     # Now we check if the username is already taken
-    existing_user = session.get(User, new_user.username)
+    duplicated_user_username = session.get(User, new_user.username)
 
-    if existing_user:
+    if duplicated_user_username:
         raise HTTPException(status_code=409, detail="Username is already taken") # 409 Conflict
     else:
         session.add(User.model_validate(new_user))
@@ -79,9 +79,9 @@ def delete_a_user(
     """Deletes a user from the list."""
 
     # We check if the user exists
-    existing_user = session.get(User, username)
+    valid_user = session.get(User, username)
 
-    if not existing_user:
+    if not valid_user:
         raise HTTPException(status_code=404, detail="User not found")
     else:
         user_to_delete = session.get(User, username)
