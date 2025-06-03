@@ -172,10 +172,6 @@ def update_event(
         # Note: the use of model_validate is not necessary, since we are adding a valid "Event" instance to the DB
         # (it already has an ID).
 
-
-
-
-
         session.add(event_to_update) # Adds the updated event to the db (with the corresponding ID)
         session.commit() # Confirms the changes
         return "Event successfully updated"
