@@ -239,6 +239,7 @@
 
             // #fix: bug caused by using response.text() on a JSON string
             return response.json()
+
           })
           .then(data => {
             modalBody.textContent = data;
