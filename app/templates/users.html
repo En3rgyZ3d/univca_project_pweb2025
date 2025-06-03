@@ -167,10 +167,17 @@
             const res = await fetch(`/users/${username}`, { method: 'DELETE' });
             if (res.ok) {
               // Optionally parse response data if needed: const data = await res.json();
-              modalBody.textContent = await res.text();
+              //modalBody.textContent = await res.text();
+
+              // #fix: bug caused by using res.text() on a JSON string
+              const message = await res.json();
+              modalBody.textContent = message;
               fetchUsers(); // Refresh the list once deletion is performed
             } else {
-              modalBody.textContent = await res.text();
+              //modalBody.textContent = await res.text();
+              // #fix: bug caused by using res.text() on a JSON string
+              const errorData = await res.json();
+              modalBody.textContent = errorData.detail;
             }
           } catch (error) {
             console.error('Error deleting user:', error);
@@ -203,12 +210,21 @@
       });
       if (res.ok) {
         // Optionally parse response data if needed: const data = await res.json();
-        modalBody.textContent = await res.text();
+        //modalBody.textContent = await res.text();
+
+        // #fix: bug caused by using res.text() on a JSON string
+        const message = await res.json();
+        modalBody.textContent = message;
+
         // Clear the form and refresh the users list
         this.reset();
         fetchUsers();
       } else {
-        modalBody.textContent = await res.text();
+        //modalBody.textContent = await res.text();
+
+        // #fix: bug caused by using res.text() on a JSON string
+        const errorData = await res.json();
+        modalBody.textContent = errorData.detail;
       }
     } catch (error) {
       console.error('Error adding user:', error);
@@ -228,7 +244,11 @@
         const res = await fetch('/users', { method: 'DELETE' });
         if (res.ok) {
           // Optionally parse response data if needed: const data = await res.json();
-          modalBody.textContent = await res.text();
+          //modalBody.textContent = await res.text();
+
+          // #fix: bug caused by using res.text() on a JSON string
+          const message = await res.json();
+          modalBody.textContent = message;
           fetchUsers();
         } else {
           modalBody.textContent = await res.text();

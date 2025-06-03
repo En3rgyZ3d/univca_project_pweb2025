@@ -215,12 +215,12 @@
             openPopup();
             }
           else {
-            console.error("Errore nella risposta del server");
+            console.error("Error in the server response");
           }
         }
         catch (error) {
           // Log any error that occurred during the fetch request
-          console.error("Errore nella fetch:", error);
+          console.error("Error during fetch", error);
         }
       });
 
@@ -280,10 +280,18 @@
       });
       if (response.ok) {
         // Optionally parse response data if needed: const data = await res.json();
-        modalBody.textContent = await response.text();
+        //modalBody.textContent = await response.text();
+
+        // #fix: bug caused by using response.text() on a JSON string
+        const message = await response.json();
+        modalBody.textContent = message;
         fetchEventDetails();
       } else {
-        modalBody.textContent = await response.text();
+        //modalBody.textContent = await response.text();
+
+        // #fix: bug caused by using response.text() on a JSON string
+        const errorData = await response.json();
+        modalBody.textContent = errorData.detail;
         console.error('Update error:', response.statusText);
       }
     } catch (error) {
@@ -315,12 +323,22 @@
       });
       if (response.ok) {
         // Optionally parse response data if needed: const data = await res.json();
-        modalBody.textContent = await response.text();
+        //modalBody.textContent = await response.text();
+
+        // #fix: bug caused by using response.text() on a JSON string
+        const message = await response.json();
+        modalBody.textContent = message;
+
         // Optionally reset the registration form
         document.getElementById('registration-form').reset();
         fetchRegistrations();
       } else {
-        modalBody.textContent = await response.text();
+        //modalBody.textContent = await response.text();
+
+        // #fix: bug caused by using response.text() on a JSON string
+        const errorData = await response.json();
+        modalBody.textContent = errorData.detail;
+
         console.error('Registration error:', response.statusText);
       }
     } catch (error) {
