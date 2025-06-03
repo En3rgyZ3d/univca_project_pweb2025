@@ -155,10 +155,10 @@ def update_event(
                                         Event.location == new_event.location,
                                         Event.date == new_event.date)
 
-        duplicate = session.exec(statement).first()
+        duplicated_event = session.exec(statement).first()
         # .first() returns the first value of the query or None if no match is found
 
-        if duplicate:
+        if duplicated_event:
             raise HTTPException(
                 status_code=409,
                 detail="This event already exists."
