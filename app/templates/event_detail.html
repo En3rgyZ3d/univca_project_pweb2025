@@ -235,7 +235,10 @@
           .then(response => {
             // Remove the item from the DOM after successful deletion
             listItem.remove();
-            return response.text()
+            //return response.text()
+
+            // #fix: bug caused by using response.text() on a JSON string
+            return response.json()
           })
           .then(data => {
             modalBody.textContent = data;
