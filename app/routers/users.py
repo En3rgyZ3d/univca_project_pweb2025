@@ -79,9 +79,9 @@ def delete_a_user(
     """Deletes a user from the list."""
 
     # We check if the user exists
-    valid_user = session.get(User, username)
+    existing_user = session.get(User, username)
 
-    if not valid_user:
+    if not existing_user:
         raise HTTPException(status_code=404, detail="User not found")
     else:
         user_to_delete = session.get(User, username)
