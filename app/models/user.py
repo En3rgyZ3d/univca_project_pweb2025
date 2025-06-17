@@ -11,5 +11,5 @@ class User(UserBase,table = True): # Class used for ORM
 
 class UserPublic(UserBase): # Class used to show User data
     pass
-class UserCreate(UserBase): # Class used to create a user, imports everything from class User
+class UserCreate(UserBase): # Class used to create a user, imports everything from class UserBase
     pass
